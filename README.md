@@ -7,7 +7,7 @@ An `Accessor` object defines the mapping between a handle and its value by defin
 
 `pointer_adaptor` makes it easy to create fancy pointers which can point to remote address spaces. For example, we can use it to define a fancy pointer type which behaves similar to `thrust::device_ptr`:
 
-```
+```c++
 #include "pointer_adaptor.hpp"
 #include <thrust/device_vector.h>
 #include <thrust/sequence.h>
