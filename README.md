@@ -19,9 +19,6 @@ struct device_memory_accessor
   __host__ __device__
   static T load(const T* ptr)
   {
-#ifdef __CUDA_ARCH__
-    return *ptr;
-#else
     T result;
     if(cudaMemcpy(&result, ptr, sizeof(T), cudaMemcpyDefault) != cudaSuccess)
     {
@@ -29,7 +26,6 @@ struct device_memory_accessor
     }
 
     return result;
-#endif
   }
 
   // stores to a device pointer from an immediate value
@@ -37,14 +33,10 @@ struct device_memory_accessor
   __host__ __device__
   static void store(T* ptr, const T& value)
   {
-#ifdef __CUDA_ARCH__
-    *ptr = value;
-#else
     if(cudaMemcpy(ptr, &value, sizeof(T), cudaMemcpyDefault) != cudaSuccess)
     {
       throw std::runtime_error("device_memory_accessor::store(): Error after cudaMemcpy");
     }
-#endif
   }
 };
 
