@@ -16,7 +16,6 @@ An `Accessor` object defines the mapping between a handle and its value by defin
 struct device_memory_accessor
 {
   template<class T>
-  __host__ __device__
   static T load(const T* ptr)
   {
     T result;
@@ -30,7 +29,6 @@ struct device_memory_accessor
 
   // stores to a device pointer from an immediate value
   template<class T>
-  __host__ __device__
   static void store(T* ptr, const T& value)
   {
     if(cudaMemcpy(ptr, &value, sizeof(T), cudaMemcpyDefault) != cudaSuccess)
