@@ -24,10 +24,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <iostream>
 #include "pointer_adaptor.hpp"
 #include <thrust/device_vector.h>
 #include <thrust/sequence.h>
+#include <iostream>
 
 struct device_memory_accessor
 {
@@ -101,7 +101,7 @@ int main()
     assert((ptr + i).get() == (d_ptr + i).get());
   }
 
-  // test deference
+  // test dereference
   for(int i = 0; i < 4; ++i)
   {
     assert(*(ptr + i) == *(d_ptr + i));
