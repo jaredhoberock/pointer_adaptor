@@ -24,10 +24,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <iostream>
 #include "pointer_adaptor.hpp"
 #include <thrust/device_vector.h>
 #include <thrust/sequence.h>
-#include <iostream>
 
 struct device_memory_accessor
 {
@@ -48,6 +48,7 @@ struct device_memory_accessor
 #endif
   }
 
+  // stores to a device pointer from an immediate value
   template<class T>
   __host__ __device__
   static void store(T* ptr, const T& value)
@@ -56,6 +57,21 @@ struct device_memory_accessor
     *ptr = value;
 #else
     if(cudaMemcpy(ptr, &value, sizeof(T), cudaMemcpyDefault) != cudaSuccess)
+    {
+      throw std::runtime_error("device_memory_accessor::store(): Error after cudaMemcpy");
+    }
+#endif
+  }
+
+  // indirectly stores to a device pointer from another device pointer
+  template<class T>
+  __host__ __device__
+  static void store(T* dst, const T* src)
+  {
+#ifdef __CUDA_ARCH__
+    *dst = *src;
+#else
+    if(cudaMemcpy(dst, src, sizeof(T), cudaMemcpyDefault) != cudaSuccess)
     {
       throw std::runtime_error("device_memory_accessor::store(): Error after cudaMemcpy");
     }
@@ -107,15 +123,35 @@ int main()
     assert(ptr[i] == d_ptr[i]);
   }
 
-  // test store
-  for(int i = 0; i < 4; ++i)
+  // test direct store
   {
-    ptr[i] = 4 - i;
+    for(int i = 0; i < 4; ++i)
+    {
+      ptr[i] = 3 - i;
+    }
+
+    for(int i = 0; i < 4; ++i)
+    {
+      assert(d_ptr[i] == 3 - i);
+    }
+
+    // restore state of vec
+    thrust::sequence(vec.begin(), vec.end());
   }
 
-  for(int i = 0; i < 4; ++i)
+  // test indirect store
   {
-    assert(d_ptr[i] == 4 - i);
+    for(int i = 0; i < 2; ++i)
+    {
+      ptr[i + 2] = ptr[i];
+    }
+
+    for(int i = 0; i < 4; ++i)
+    {
+      assert(d_ptr[i] == i % 2);
+    }
+
+    // restore state of vec
   }
 
   std::cout << "OK" << std::endl;
