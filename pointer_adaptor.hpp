@@ -62,6 +62,7 @@ class pointer_adaptor : private Accessor
     class reference : private Accessor
     {
       private:
+        // note that we derive from Accessor for the empty base class optimization
         using super_t = Accessor;
 
       public:
@@ -76,6 +77,12 @@ class pointer_adaptor : private Accessor
         operator element_type () const
         {
           return this->load(accessor(), handle_);
+        }
+
+        // address-of operator returns a pointer_adaptor
+        pointer_adaptor operator&() const
+        {
+          return pointer_adaptor(handle_, accessor());
         }
 
         template<__POINTER_ADAPTOR_REQUIRES(

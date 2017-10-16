@@ -66,6 +66,9 @@ struct device_memory_accessor
 template<class T>
 using my_device_ptr = pointer_adaptor<T, device_memory_accessor>;
 
+template<class T>
+using my_device_reference = typename pointer_adaptor<T, device_memory_accessor>::reference;
+
 int main()
 {
   thrust::device_vector<int> vec(4);
@@ -86,6 +89,16 @@ int main()
   for(int i = 0; i < 4; ++i)
   {
     assert(*(ptr + i) == *(d_ptr + i));
+  }
+
+  // test dereference-address-of-dererefence cycle
+  for(int i = 0; i < 4; ++i)
+  {
+    my_device_reference<int> ref = *(ptr + i);
+
+    my_device_ptr<int> ptr2 = &ref;
+
+    assert(*ptr2 == *(d_ptr + i));
   }
 
   // test subscript
