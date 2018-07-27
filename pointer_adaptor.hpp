@@ -192,7 +192,6 @@ class pointer_adaptor_reference : private Accessor
     template<__POINTER_ADAPTOR_REQUIRES(accessor_has_member_store<const value_type&>::value)>
     static void store(const accessor_type& accessor, const handle_type& handle, const value_type& value)
     {
-      std::cout << "store(): calling accessor.store()" << std::endl;
       accessor.store(handle, value);
     }
   
@@ -202,7 +201,6 @@ class pointer_adaptor_reference : private Accessor
     template<__POINTER_ADAPTOR_REQUIRES(!accessor_has_member_store<const value_type&>::value and std::is_pointer<handle_type>::value)>
     static void store(const accessor_type&, const handle_type& handle, const value_type& value)
     {
-      std::cout << "store(): *handle = value" << std::endl;
       *handle = value;
     }
   
@@ -211,7 +209,6 @@ class pointer_adaptor_reference : private Accessor
     template<__POINTER_ADAPTOR_REQUIRES(accessor_has_member_store<handle_type>::value)>
     static void store(const accessor_type& accessor, const handle_type& dst, const handle_type& src)
     {
-      std::cout << "store(): calling accessor.store(dst, src)" << std::endl;
       accessor.store(dst, src);
     }
   
